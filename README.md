@@ -24,7 +24,23 @@ An end-to-end machine learning project predicting the size of startup funding ro
 3. **Preprocessing:** Median imputation and standard scaling for numeric features; most-frequent imputation and one-hot encoding for categorical features, via a `ColumnTransformer` pipeline.
 4. **Modeling:** Compared Linear Regression, Decision Tree, and Random Forest using 5-fold cross-validation. Random Forest performed best and was selected for tuning.
 5. **Fine-tuning & evaluation:** Random forest hyperparameters tuned with `RandomizedSearchCV`; final model evaluated on a held-out test set (RMSE ≈ $19.3M, MAE ≈ $7.6M), with a bootstrap 95% confidence interval for test RMSE.
-6. **Feature importance:** Growth stage, launch year, total rounds raised, and round type were the strongest predictors. `Publicly Backed` showed a clear association with larger rounds in simple comparisons but ranked low in feature importance — suggesting the association is largely explained by publicly backed rounds occurring at later funding stages, rather than public backing independently driving round size.
+6. **Feature importance:** Growth stage, launch year, total rounds raised, and round type were the strongest predictors.
+
+## Main findings & charts
+
+**Disclosure is not random.** 45.6% of rounds have no disclosed amount, and it's concentrated in early-stage and hard-to-access round types — Support Program and Spinout rounds are disclosed less than 15% of the time, versus ~70% for Seed and Early VC. This means the modeling sample skews toward later-stage, better-documented rounds.
+
+![Amount disclosure by round type](./images/disclosure_by_round_type.png)
+
+**Round sizes are heavily right-skewed.** Most disclosed rounds are a few million dollars, but a handful of mega-rounds (up to $417.5M) stretch the distribution — the reason RMSE is reported alongside the more outlier-robust MAE, and why median (not mean) imputation was used.
+
+![Distribution of funding round amounts](./images/amount_distribution.png)
+
+**Publicly backed rounds are larger — but the model says it's mostly about timing.** Rounds with a government or semi-public investor present have a median size roughly 4–5x larger than rounds without ($10–11M vs. $2–2.2M). But in the tuned Random Forest, `Publicly Backed` did not rank among the top 15 features by importance — growth stage, launch year, total rounds raised, and round type dominated instead. The likely explanation: publicly backed rounds tend to happen at later funding stages, and stage is already a strong predictor on its own — so backing and round size are associated, not necessarily a case of backing *causing* bigger rounds.
+
+![Round amount by public backing](./images/amount_by_public_backing.png)
+
+**Final model performance:** the tuned Random Forest reached a test RMSE of $19.30M and MAE of $7.56M (95% bootstrap CI for RMSE: $8.83M–$29.96M), outperforming both Linear Regression and an untuned Decision Tree in cross-validation.
 
 ## Key limitations
 
@@ -45,3 +61,4 @@ Structure and several helper functions adapted from Aurélien Géron's end-to-en
 ## Contents
 
 - [`EglantineDupuy_EDS_Assignment1.ipynb`](./EglantineDupuy_EDS_Assignment1.ipynb) — the full analysis notebook.
+- [`images/`](./images) — charts exported from the notebook, embedded above.
